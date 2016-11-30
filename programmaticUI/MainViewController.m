@@ -36,6 +36,7 @@ static CGFloat screenHeight;
     [self createSegmentedButton];
     [self createMyTextView];
     [self createCornerUIView];
+    [self createSimpleCalculator];
 }
 
 
@@ -56,7 +57,7 @@ static CGFloat screenHeight;
 
 - (void) createImageView {
     // Creating a UIImageView programmactically
-    self.myImageView = [[UIImageView alloc] initWithFrame:CGRectMake((screenWidth-(MAX_NUM*1.5))/2, MAX_NUM*1.25, MAX_NUM*1.5, MAX_NUM*1.5)];
+    self.myImageView = [[UIImageView alloc] initWithFrame:CGRectMake((screenWidth-MAX_NUM)/2, MAX_NUM*01.025, MAX_NUM, MAX_NUM)];
     self.myImageView.image = [ UIImage  imageNamed: @"turntotech.png"];
     self.myImageView.backgroundColor = [UIColor whiteColor];
     self.myImageView.contentMode = UIViewContentModeScaleAspectFit;
@@ -82,12 +83,12 @@ static CGFloat screenHeight;
     self.rotateButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     
     //set the position of the button
-    self.rotateButton.frame = CGRectMake((screenWidth-(MAX_NUM*3))/2, MAX_NUM*3.25, MAX_NUM*3, MAX_NUM/2);
+    self.rotateButton.frame = CGRectMake((screenWidth-(MAX_NUM*2))/2, MAX_NUM*2.25, MAX_NUM*2, MAX_NUM/4);
     self.rotateButton.layer.cornerRadius = 5;
     
     //set the button's title
     [self.rotateButton setTitle:@"Click to rotate Image" forState:UIControlStateNormal];
-    self.rotateButton.titleLabel.font = [UIFont systemFontOfSize:20];
+    self.rotateButton.titleLabel.font = [UIFont systemFontOfSize:17];
     self.rotateButton.backgroundColor = [UIColor greenColor];
     [self.rotateButton addTarget:self  action:@selector(rotateButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview: self.rotateButton];
@@ -96,34 +97,9 @@ static CGFloat screenHeight;
 - (void) createUIView {
     
     // create subView for customization
-    self.myView = [[UIView alloc] initWithFrame:CGRectMake(50, screenHeight - (MAX_NUM * 2.5), screenWidth - MAX_NUM, 25)];
+    self.myView = [[UIView alloc] initWithFrame:CGRectMake(50, screenHeight - (MAX_NUM * 4.0), screenWidth - MAX_NUM, 25)];
     self.myView.backgroundColor = [UIColor yellowColor];
     [self.view addSubview:self.myView];
-}
-
-- (void) createCornerUIView {
-    
-    // create a view that is pinned to lower rhs of screen regardless of orientation
-    self.myCornerView = [[UIView alloc] init];
-    NSLog(@"%d",UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation));
-    
-    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
-    
-    if(orientation == 0) { //Default orientation
-        //UI is in Default (Portrait) -- this is really a just a failsafe.
-        self.myCornerView.frame = CGRectMake(screenWidth-MAX_NUM, screenHeight - MAX_NUM, MAX_NUM, MAX_NUM);
-    }
-    else if ((orientation == UIInterfaceOrientationPortrait) || (orientation == UIInterfaceOrientationPortraitUpsideDown)) {
-        //Do something if the orientation is in Portrait
-        self.myCornerView.frame = CGRectMake(screenWidth-MAX_NUM, screenHeight - MAX_NUM, MAX_NUM, MAX_NUM);
-    }
-    else if((orientation == UIInterfaceOrientationLandscapeLeft)  || (orientation == UIInterfaceOrientationLandscapeRight)){
-        // Do something if orientation is in Landscape
-        self.myCornerView.frame = CGRectMake(screenHeight - MAX_NUM,  screenWidth-MAX_NUM, MAX_NUM, MAX_NUM);
-    }
-    
-    self.myCornerView.backgroundColor = [UIColor greenColor];
-    [self.view addSubview:self.myCornerView];
 }
 
 
@@ -133,7 +109,7 @@ static CGFloat screenHeight;
     self.mySegmentedControl = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"IOS", @"Android",nil]];
     
     // center on page
-    self.mySegmentedControl.frame = CGRectMake((screenWidth - (self.mySegmentedControl.frame.size.width))/2, 450, self.mySegmentedControl.frame.size.width, self.mySegmentedControl.frame.size.height);
+    self.mySegmentedControl.frame = CGRectMake((screenWidth - (self.mySegmentedControl.frame.size.width))/2, 300, self.mySegmentedControl.frame.size.width, self.mySegmentedControl.frame.size.height);
 
     // set background color
     self.mySegmentedControl.backgroundColor = [UIColor cyanColor];
@@ -170,7 +146,72 @@ static CGFloat screenHeight;
     [self.view addSubview: self.myTextView];
 }
 
+- (void) createSimpleCalculator {
+    
+    // create field for num1
+    self.num1 = [[UITextField alloc] initWithFrame:CGRectMake((screenWidth - MAX_NUM*3.0)/2, (screenHeight+10 - MAX_NUM*3.0), MAX_NUM, MAX_NUM/4)];
+    self.num1.textColor = [UIColor lightGrayColor];
+    self.num1.layer.borderWidth = 1;
+    self.num1.layer.borderColor = [UIColor lightGrayColor].CGColor;
+    [self.num1 setFont:[UIFont fontWithName:@"Helvetica" size:14]];
+    self.num1.placeholder = @" Enter 1st # ";
+    self.num1.textAlignment =  NSTextAlignmentCenter;
+    [self.view addSubview: self.num1];
 
+    // create field for num2
+    self.num2 = [[UITextField alloc] initWithFrame:CGRectMake((screenWidth - MAX_NUM*3.0)/2, (screenHeight+45 - MAX_NUM*3.0), MAX_NUM, MAX_NUM/4)];
+    self.num2.textColor = [UIColor lightGrayColor];
+    self.num2.layer.borderWidth = 1;
+    self.num2.layer.borderColor = [UIColor lightGrayColor].CGColor;
+    self.num2.placeholder = @" Enter 2nd # ";
+    [self.num2 setFont:[UIFont fontWithName:@"Helvetica" size:14]];
+    self.num2.textAlignment =  NSTextAlignmentCenter;
+    [self.view addSubview: self.num2];
+    
+    // create a button to ADD num1 & num2
+    UIButton *addButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    addButton.frame = CGRectMake((screenWidth - MAX_NUM*.5)/2, screenHeight+7 - MAX_NUM*3.0, MAX_NUM/2, MAX_NUM/2 + 15);
+    addButton.backgroundColor = [UIColor cyanColor];
+    [addButton setTitle:@"ADD" forState:UIControlStateNormal];
+    self.rotateButton.titleLabel.font = [UIFont systemFontOfSize:17];
+    [addButton addTarget:self action:@selector(addButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview: addButton];
+    
+    // create field for sum
+    self.sum = [[UILabel alloc] initWithFrame:CGRectMake((screenWidth - MAX_NUM*(-.75))/2, (screenHeight+25 - MAX_NUM*3.0), MAX_NUM, MAX_NUM/4)];
+    self.sum.textColor = [UIColor lightGrayColor];
+    self.sum.textAlignment =  NSTextAlignmentCenter;
+    self.sum.layer.borderWidth = 1;
+    self.sum.text = @" 0 ";
+    self.sum.layer.borderColor = [UIColor lightGrayColor].CGColor;
+    [self.view addSubview: self.sum];
+
+}
+
+- (void) createCornerUIView {
+    
+    // create a view that is pinned to lower rhs corner of screen and is visible regardless of orientation
+    self.myCornerView = [[UIView alloc] init];
+    NSLog(@"%d",UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation));
+    
+    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+    
+    if(orientation == 0) { //Default orientation
+                           //UI is in Default (Portrait) -- this is really a just a failsafe.
+        self.myCornerView.frame = CGRectMake(screenWidth-MAX_NUM, screenHeight - MAX_NUM, MAX_NUM, MAX_NUM);
+    }
+    else if ((orientation == UIInterfaceOrientationPortrait) || (orientation == UIInterfaceOrientationPortraitUpsideDown)) {
+        //Do something if the orientation is in Portrait
+        self.myCornerView.frame = CGRectMake(screenWidth-MAX_NUM, screenHeight - MAX_NUM, MAX_NUM, MAX_NUM);
+    }
+    else if((orientation == UIInterfaceOrientationLandscapeLeft)  || (orientation == UIInterfaceOrientationLandscapeRight)){
+        // Do something if orientation is in Landscape
+        self.myCornerView.frame = CGRectMake(screenHeight - MAX_NUM,  screenWidth-MAX_NUM, MAX_NUM, MAX_NUM);
+    }
+    
+    self.myCornerView.backgroundColor = [UIColor greenColor];
+    [self.view addSubview:self.myCornerView];
+}
 
 #pragma mark Button Tapped Methods
 
@@ -187,10 +228,15 @@ static CGFloat screenHeight;
     if (self.mySegmentedControl.selectedSegmentIndex == 0) {
         self.myView.backgroundColor = [UIColor blueColor];
     } else {
-        self.myView.backgroundColor = [UIColor yellowColor];
+        self.myView.backgroundColor = [UIColor purpleColor];
     }
 }
 
+
+- (IBAction)addButtonTapped:(id)sender {
+    self.sum.text = [NSString stringWithFormat:@"%d", [self.num1.text intValue] +  [self.num2.text intValue]];
+//    self.sum.text = [self.num1.text intValue] +  [self.num2.text intValue];
+}
 
 #pragma mark Check Device Orientation
 

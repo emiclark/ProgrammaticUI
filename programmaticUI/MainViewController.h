@@ -16,6 +16,9 @@
 @property (nonatomic,strong) UIButton *rotateButton;
 @property (nonatomic,strong) UISegmentedControl *mySegmentedControl;
 @property (nonatomic,strong) UITextView *myTextView;
+@property (nonatomic,strong) UITextField *num1;
+@property (nonatomic,strong) UITextField *num2;
+@property (nonatomic,strong) UILabel *sum;
 
 - (void) createLabel;
 - (void) createImageView;
@@ -24,8 +27,11 @@
 - (void) createCornerUIView;
 - (void) createSegmentedButton;
 - (void) createMyTextView;
+- (void) createSimpleCalculator;
 
 - (IBAction) rotateButtonTapped: (id)sender;
 - (IBAction) mySegmentedControlTapped: (id)sender;
+- (IBAction)addButtonTapped:(id)sender;
+
 
 @end
