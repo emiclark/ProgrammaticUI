@@ -37,6 +37,11 @@ static CGFloat screenHeight;
     [self createMyTextView];
     [self createCornerUIView];
     [self createSimpleCalculator];
+    
+    // add tap gesture to dismiss keyboard when tapped outside of uitextfield
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
+    [self.view addGestureRecognizer:tap];
+    
 }
 
 
@@ -173,7 +178,7 @@ static CGFloat screenHeight;
     addButton.frame = CGRectMake((screenWidth - MAX_NUM*.5)/2, screenHeight+7 - MAX_NUM*3.0, MAX_NUM/2, MAX_NUM/2 + 15);
     addButton.backgroundColor = [UIColor cyanColor];
     [addButton setTitle:@"ADD" forState:UIControlStateNormal];
-    self.rotateButton.titleLabel.font = [UIFont systemFontOfSize:17];
+    addButton.titleLabel.font = [UIFont systemFontOfSize:17];
     [addButton addTarget:self action:@selector(addButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview: addButton];
     
@@ -235,8 +240,14 @@ static CGFloat screenHeight;
 
 - (IBAction)addButtonTapped:(id)sender {
     self.sum.text = [NSString stringWithFormat:@"%d", [self.num1.text intValue] +  [self.num2.text intValue]];
-//    self.sum.text = [self.num1.text intValue] +  [self.num2.text intValue];
 }
+
+-(void)dismissKeyboard
+{
+    [self.num1 resignFirstResponder];
+    [self.num2 resignFirstResponder];
+}
+
 
 #pragma mark Check Device Orientation
 
