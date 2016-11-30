@@ -7,7 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-//#import "AppDelegate.h"
 
 @interface MainViewController : UIViewController
 @property (nonatomic,strong) UILabel *myLabel;

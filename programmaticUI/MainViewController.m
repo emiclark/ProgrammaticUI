@@ -6,8 +6,6 @@
 //  Copyright © 2016 emikoclark. All rights reserved.
 //
 
-// >> check device orientation methods
-
 #import "MainViewController.h"
 
 @interface MainViewController ()
@@ -38,10 +36,6 @@ static CGFloat screenHeight;
     [self createSegmentedButton];
     [self createMyTextView];
     [self createCornerUIView];
-    
-//    // add notification that will detect change in device orientation. Calls orientationChanged which then calls adjustViewsForOrientation Methods
-//    [[NSNotificationCenter defaultCenter] addObserver:self  selector:@selector(orientationChanged:) name:UIDeviceOrientationDidChangeNotification  object:nil];
-    
 }
 
 
@@ -199,7 +193,6 @@ static CGFloat screenHeight;
 
 
 #pragma mark Check Device Orientation
-//=======================================
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id <UIViewControllerTransitionCoordinator>)coordinator
 {
