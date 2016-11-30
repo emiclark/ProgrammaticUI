@@ -6,6 +6,8 @@
 //  Copyright © 2016 emikoclark. All rights reserved.
 //
 
+// >> check device orientation methods
+
 #import "MainViewController.h"
 
 @interface MainViewController ()
@@ -28,15 +30,20 @@ static CGFloat screenHeight;
     screenWidth = CGRectGetWidth(screenSize);
     screenHeight = CGRectGetHeight(screenSize);
         
-    // Creating a UILabel programmactically
+    // Create objects programmactically
     [self createLabel];
     [self createImageView];
     [self createRotateButton];
     [self createUIView];
     [self createSegmentedButton];
     [self createMyTextView];
-
+    [self createCornerUIView];
+    
+//    // add notification that will detect change in device orientation. Calls orientationChanged which then calls adjustViewsForOrientation Methods
+//    [[NSNotificationCenter defaultCenter] addObserver:self  selector:@selector(orientationChanged:) name:UIDeviceOrientationDidChangeNotification  object:nil];
+    
 }
+
 
 #pragma mark Create elements
 
@@ -45,10 +52,7 @@ static CGFloat screenHeight;
     self.myLabel = [[UILabel alloc] init];
     self.myLabel.text = @"TurnToTech";
     self.myLabel.textAlignment = NSTextAlignmentCenter;
-//    self.myLabel.frame =  CGRectMake(10, 10, MAX_NUM*1.5, 50);
-        self.myLabel.frame =  CGRectMake((screenWidth - (MAX_NUM*1.25))/2, MAX_NUM/2, MAX_NUM*1.25, 50);
-    NSLog(@"label size: %ld",(long)self.myLabel.frame.size.width);
-
+    self.myLabel.frame =  CGRectMake((screenWidth - (MAX_NUM*1.25))/2, MAX_NUM/2, MAX_NUM*1.25, 50);
     self.myLabel.textColor = [UIColor blueColor];
     self.myLabel.backgroundColor = [UIColor whiteColor];
     [self.myLabel setFont:[UIFont fontWithName: @"Helvetica"  size:24]];
@@ -98,10 +102,36 @@ static CGFloat screenHeight;
 - (void) createUIView {
     
     // create subView for customization
-    self.myView = [[UIView alloc] initWithFrame:CGRectMake(50, screenHeight - (MAX_NUM * 3.5), screenWidth - MAX_NUM, 25)];
+    self.myView = [[UIView alloc] initWithFrame:CGRectMake(50, screenHeight - (MAX_NUM * 2.5), screenWidth - MAX_NUM, 25)];
     self.myView.backgroundColor = [UIColor yellowColor];
     [self.view addSubview:self.myView];
 }
+
+- (void) createCornerUIView {
+    
+    // create a view that is pinned to lower rhs of screen regardless of orientation
+    self.myCornerView = [[UIView alloc] init];
+    NSLog(@"%d",UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation));
+    
+    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+    
+    if(orientation == 0) { //Default orientation
+        //UI is in Default (Portrait) -- this is really a just a failsafe.
+        self.myCornerView.frame = CGRectMake(screenWidth-MAX_NUM, screenHeight - MAX_NUM, MAX_NUM, MAX_NUM);
+    }
+    else if ((orientation == UIInterfaceOrientationPortrait) || (orientation == UIInterfaceOrientationPortraitUpsideDown)) {
+        //Do something if the orientation is in Portrait
+        self.myCornerView.frame = CGRectMake(screenWidth-MAX_NUM, screenHeight - MAX_NUM, MAX_NUM, MAX_NUM);
+    }
+    else if((orientation == UIInterfaceOrientationLandscapeLeft)  || (orientation == UIInterfaceOrientationLandscapeRight)){
+        // Do something if orientation is in Landscape
+        self.myCornerView.frame = CGRectMake(screenHeight - MAX_NUM,  screenWidth-MAX_NUM, MAX_NUM, MAX_NUM);
+    }
+    
+    self.myCornerView.backgroundColor = [UIColor greenColor];
+    [self.view addSubview:self.myCornerView];
+}
+
 
 - (void) createSegmentedButton {
 
@@ -138,7 +168,7 @@ static CGFloat screenHeight;
         self.myTextView.text = [self.myTextView.text stringByAppendingString: @"The quick brown fox jumps upon a lazy dog.\n"];
     }
     self.myTextView.backgroundColor = [UIColor redColor];
-    [self.myTextView setFont:[UIFont fontWithName:@"Helvetica" size:20]];
+    [self.myTextView setFont:[UIFont fontWithName:@"Helvetica" size:17]];
     self.myTextView.textColor = [UIColor whiteColor];
     self.myTextView.scrollEnabled = YES;
     
@@ -168,11 +198,34 @@ static CGFloat screenHeight;
 }
 
 
+#pragma mark Check Device Orientation
+//=======================================
+
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id <UIViewControllerTransitionCoordinator>)coordinator
+{
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    
+    // Code to execute before the rotation begins.
+    
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        
+    // Code to perform animations during the rotation, or pass nil or leave this block empty if not necessary.
+        
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        
+        // Code here will execute after the rotation has finished.
+
+        // check self.view size and set self.myCornerView to lower rhs after rotation
+        self.myCornerView.frame = CGRectMake(self.view.bounds.size.width - MAX_NUM, self.view.bounds.size.height - MAX_NUM, MAX_NUM, MAX_NUM);
+    }];
+}
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
 
 /*
 #pragma mark - Navigation

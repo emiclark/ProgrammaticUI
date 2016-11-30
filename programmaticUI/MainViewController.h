@@ -13,6 +13,7 @@
 @property (nonatomic,strong) UILabel *myLabel;
 @property (nonatomic,strong) UIImageView *myImageView;
 @property (nonatomic,strong) UIView *myView;
+@property (nonatomic,strong) UIView *myCornerView;
 @property (nonatomic,strong) UIButton *rotateButton;
 @property (nonatomic,strong) UISegmentedControl *mySegmentedControl;
 @property (nonatomic,strong) UITextView *myTextView;
@@ -21,6 +22,7 @@
 - (void) createImageView;
 - (void) createRotateButton;
 - (void) createUIView;
+- (void) createCornerUIView;
 - (void) createSegmentedButton;
 - (void) createMyTextView;
 

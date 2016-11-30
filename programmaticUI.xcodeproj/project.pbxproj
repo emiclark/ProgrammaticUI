@@ -267,6 +267,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = X9KW2SQ39Q;
 				INFOPLIST_FILE = programmaticUI/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.turntotech.tutorial.programmaticUI;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -279,6 +280,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = X9KW2SQ39Q;
 				INFOPLIST_FILE = programmaticUI/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.turntotech.tutorial.programmaticUI;
 				PRODUCT_NAME = "$(TARGET_NAME)";
