@@ -15,20 +15,88 @@
 @implementation MainViewController
 
 #define MAX_NUM 100
+#define TEXTVIEW_HEIGHT 500
 
 static CGRect screenSize;
 static CGFloat screenWidth;
 static CGFloat screenHeight;
+static UIButton *addButton;
+
+#pragma mark View methods
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    // calculate screen dimensions for centering uivew
+    self.view.frame = self.view.bounds;
+
+    self.view.backgroundColor = [UIColor colorWithRed:200/255. green:240/255. blue:252/255. alpha:1.0];
+
+    // calculate screen dimensions for centering uivew in portrait mode
     screenSize = [[UIScreen mainScreen] bounds];
     screenWidth = CGRectGetWidth(screenSize);
     screenHeight = CGRectGetHeight(screenSize);
         
+    // Create all objects programmactically
+    [self createAllObjects];
+    
+    // set green square to lower rhs corner of screen
+    self.myCornerView.frame = CGRectMake(screenWidth-MAX_NUM, screenHeight - MAX_NUM, MAX_NUM, MAX_NUM);
+    [self.view bringSubviewToFront: self.myCornerView];
+    
+    // add tap gesture to dismiss keyboard when tapped outside of uitextfield
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
+    [self.view addGestureRecognizer:tap];
+}
+
+#pragma mark Check Device Orientation
+
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id <UIViewControllerTransitionCoordinator>)coordinator {
+    
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    
+    // Code to execute before the rotation begins.
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        
+        // Code to perform animations during the rotation, or pass nil or leave this block empty if not necessary.
+    
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        
+        // Code to execute after the rotation has finished
+        
+        // check if orientation is portrait or landscape
+        
+        if (self.view.frame.size.width == screenWidth) {
+            // in portrait mode
+            // check self.view size and set self.myCornerView to lower rhs after rotation
+            self.myCornerView.frame = CGRectMake(screenWidth - MAX_NUM, screenHeight - MAX_NUM, MAX_NUM, MAX_NUM);
+            [self.view bringSubviewToFront:self.myCornerView];
+            
+            // reset self.myScrollView height to screen height when in portrait mode
+            self.myScrollView.frame = CGRectMake(0, 0, screenWidth, screenHeight);
+            
+            [self.myScrollView setContentSize:(CGSizeMake(screenWidth, screenHeight))];
+        
+        } else {
+        // in orientation is landscape
+            
+            // check self.view size and set self.myCornerView to lower rhs after rotation
+            self.myCornerView.frame = CGRectMake(screenHeight - MAX_NUM, screenWidth - MAX_NUM, MAX_NUM, MAX_NUM);
+            
+            // reset self.myScrollView height to screen height when in portrait mode
+            self.myScrollView.frame = CGRectMake(0, 0, screenWidth, screenHeight);
+            
+            // calculate scroll view's content height
+            CGFloat scrollHeight = [self calculateScrollContentHeight];
+            [self.myScrollView setContentSize:(CGSizeMake(screenWidth, scrollHeight))];
+        }
+    }];
+  }
+
+
+#pragma mark Create objects and subviews
+
+- (void) createAllObjects {
     // Create objects programmactically
+    [self createScrollView];
     [self createLabel];
     [self createImageView];
     [self createRotateButton];
@@ -37,26 +105,31 @@ static CGFloat screenHeight;
     [self createMyTextView];
     [self createCornerUIView];
     [self createSimpleCalculator];
-    
-    // add tap gesture to dismiss keyboard when tapped outside of uitextfield
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
-    [self.view addGestureRecognizer:tap];
-    
 }
 
+- (void) createScrollView {
+    // create scroll view to scroll through content when device is in landscape mode
+    self.myScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, screenWidth, screenHeight)];
+    self.myScrollView.autoresizesSubviews = YES;
+    self.myScrollView.contentMode = UIViewContentModeCenter;
 
-#pragma mark Create elements
+    self.myScrollView.contentSize = CGSizeMake(screenWidth, screenHeight);
+    [self.view addSubview: self.myScrollView];
+    
+    // create myContentView to put all subviews to facillitate calculating scrollview height for when in landscape/portrait
+    self.myContentView = [[UIView alloc] initWithFrame:self.myScrollView.frame];
+    [self.myScrollView addSubview: self.myContentView];
+}
 
 - (void) createLabel {
     // Creating a UILabel programmactically
     self.myLabel = [[UILabel alloc] init];
     self.myLabel.text = @"TurnToTech";
     self.myLabel.textAlignment = NSTextAlignmentCenter;
-    self.myLabel.frame =  CGRectMake((screenWidth - (MAX_NUM*1.25))/2, MAX_NUM/2, MAX_NUM*1.25, 50);
+    self.myLabel.frame =  CGRectMake((screenWidth - (MAX_NUM*2.25))/2, MAX_NUM/2, MAX_NUM*2.25, 50);
     self.myLabel.textColor = [UIColor blueColor];
-    self.myLabel.backgroundColor = [UIColor whiteColor];
-    [self.myLabel setFont:[UIFont fontWithName: @"Helvetica"  size:24]];
-    [self.view addSubview: self.myLabel];
+    [self.myLabel setFont:[UIFont fontWithName: @"Helvetica"  size:26]];
+    [self.myContentView addSubview: self.myLabel];
 }
 
 
@@ -77,8 +150,7 @@ static CGFloat screenHeight;
     self.myImageView.layer.shadowRadius = 5;
     self.myImageView.layer.shadowOpacity = 0.5f;
     self.myImageView.layer.shadowPath = dropShadow.CGPath;
-
-    [self.view addSubview: self.myImageView];
+    [self.myContentView addSubview: self.myImageView];
 
 }
 
@@ -96,7 +168,7 @@ static CGFloat screenHeight;
     self.rotateButton.titleLabel.font = [UIFont systemFontOfSize:17];
     self.rotateButton.backgroundColor = [UIColor greenColor];
     [self.rotateButton addTarget:self  action:@selector(rotateButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview: self.rotateButton];
+    [self.myContentView addSubview: self.rotateButton];
 }
 
 - (void) createUIView {
@@ -104,7 +176,7 @@ static CGFloat screenHeight;
     // create subView for customization
     self.myView = [[UIView alloc] initWithFrame:CGRectMake(50, screenHeight - (MAX_NUM * 4.0), screenWidth - MAX_NUM, 25)];
     self.myView.backgroundColor = [UIColor yellowColor];
-    [self.view addSubview:self.myView];
+    [self.myContentView addSubview:self.myView];
 }
 
 
@@ -132,11 +204,11 @@ static CGFloat screenHeight;
     [self.mySegmentedControl addTarget:self action:@selector(mySegmentedControlTapped:) forControlEvents: UIControlEventValueChanged];
     
     // add to view
-    [self.view addSubview:self.mySegmentedControl];
+    [self.myContentView addSubview:self.mySegmentedControl];
 }
 
 - (void) createMyTextView {
-    self.myTextView = [[UITextView alloc] initWithFrame:CGRectMake(0, 500, screenWidth, screenHeight - (screenHeight/3))];
+    self.myTextView = [[UITextView alloc] initWithFrame:CGRectMake(0, TEXTVIEW_HEIGHT, screenWidth, screenHeight - (screenHeight/3))];
     
     // initialize text into textView
     for (int i=0; i< 50; i++) {
@@ -146,9 +218,7 @@ static CGFloat screenHeight;
     [self.myTextView setFont:[UIFont fontWithName:@"Helvetica" size:17]];
     self.myTextView.textColor = [UIColor whiteColor];
     self.myTextView.scrollEnabled = YES;
-    
-    // add to view
-    [self.view addSubview: self.myTextView];
+    [self.myContentView addSubview: self.myTextView];
 }
 
 - (void) createSimpleCalculator {
@@ -156,72 +226,60 @@ static CGFloat screenHeight;
     // create field for num1
     self.num1 = [[UITextField alloc] initWithFrame:CGRectMake((screenWidth - MAX_NUM*3.0)/2, (screenHeight+10 - MAX_NUM*3.0), MAX_NUM, MAX_NUM/4)];
     self.num1.textColor = [UIColor lightGrayColor];
+    self.num1.backgroundColor = [UIColor whiteColor];
     self.num1.layer.borderWidth = 1;
-    self.num1.layer.borderColor = [UIColor lightGrayColor].CGColor;
+    self.num1.layer.borderColor = [UIColor darkGrayColor].CGColor;
     [self.num1 setFont:[UIFont fontWithName:@"Helvetica" size:14]];
     self.num1.placeholder = @" Enter 1st # ";
     self.num1.textAlignment =  NSTextAlignmentCenter;
-    [self.view addSubview: self.num1];
+    [self.myContentView addSubview: self.num1];
 
     // create field for num2
     self.num2 = [[UITextField alloc] initWithFrame:CGRectMake((screenWidth - MAX_NUM*3.0)/2, (screenHeight+45 - MAX_NUM*3.0), MAX_NUM, MAX_NUM/4)];
     self.num2.textColor = [UIColor lightGrayColor];
+    self.num2.backgroundColor = [UIColor whiteColor];
     self.num2.layer.borderWidth = 1;
-    self.num2.layer.borderColor = [UIColor lightGrayColor].CGColor;
+    self.num2.layer.borderColor = [UIColor darkGrayColor].CGColor;
     self.num2.placeholder = @" Enter 2nd # ";
     [self.num2 setFont:[UIFont fontWithName:@"Helvetica" size:14]];
     self.num2.textAlignment =  NSTextAlignmentCenter;
-    [self.view addSubview: self.num2];
+    [self.myContentView addSubview: self.num2];
     
-    // create a button to ADD num1 & num2
-    UIButton *addButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    // create an addButton to ADD num1 & num2
+    addButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     addButton.frame = CGRectMake((screenWidth - MAX_NUM*.5)/2, screenHeight+7 - MAX_NUM*3.0, MAX_NUM/2, MAX_NUM/2 + 15);
     addButton.backgroundColor = [UIColor cyanColor];
     [addButton setTitle:@"ADD" forState:UIControlStateNormal];
     addButton.titleLabel.font = [UIFont systemFontOfSize:17];
     [addButton addTarget:self action:@selector(addButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview: addButton];
-    
+    [self.myContentView addSubview: addButton];
+ 
     // create field for sum
     self.sum = [[UILabel alloc] initWithFrame:CGRectMake((screenWidth - MAX_NUM*(-.75))/2, (screenHeight+25 - MAX_NUM*3.0), MAX_NUM, MAX_NUM/4)];
     self.sum.textColor = [UIColor lightGrayColor];
     self.sum.textAlignment =  NSTextAlignmentCenter;
+    self.sum.backgroundColor = [UIColor whiteColor];
     self.sum.layer.borderWidth = 1;
     self.sum.text = @" 0 ";
-    self.sum.layer.borderColor = [UIColor lightGrayColor].CGColor;
-    [self.view addSubview: self.sum];
-
+    self.sum.layer.borderColor = [UIColor darkGrayColor].CGColor;
+    [self.myContentView addSubview: self.sum];
+    [self.view addSubview: self.myScrollView];
 }
 
 - (void) createCornerUIView {
     
     // create a view that is pinned to lower rhs corner of screen and is visible regardless of orientation
     self.myCornerView = [[UIView alloc] init];
-    NSLog(@"%d",UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation));
-    
-    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
-    
-    if(orientation == 0) { //Default orientation
-                           //UI is in Default (Portrait) -- this is really a just a failsafe.
-        self.myCornerView.frame = CGRectMake(screenWidth-MAX_NUM, screenHeight - MAX_NUM, MAX_NUM, MAX_NUM);
-    }
-    else if ((orientation == UIInterfaceOrientationPortrait) || (orientation == UIInterfaceOrientationPortraitUpsideDown)) {
-        //Do something if the orientation is in Portrait
-        self.myCornerView.frame = CGRectMake(screenWidth-MAX_NUM, screenHeight - MAX_NUM, MAX_NUM, MAX_NUM);
-    }
-    else if((orientation == UIInterfaceOrientationLandscapeLeft)  || (orientation == UIInterfaceOrientationLandscapeRight)){
-        // Do something if orientation is in Landscape
-        self.myCornerView.frame = CGRectMake(screenHeight - MAX_NUM,  screenWidth-MAX_NUM, MAX_NUM, MAX_NUM);
-    }
-    
     self.myCornerView.backgroundColor = [UIColor greenColor];
     [self.view addSubview:self.myCornerView];
+    [self.view bringSubviewToFront: self.myCornerView];
 }
 
 #pragma mark Button Tapped Methods
 
 - (IBAction) rotateButtonTapped: (id)sender {
     
+    // tapping the rotate button rotates the image 90 degrees
     [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationOptionTransitionNone animations:^ {
         self.myImageView.transform = CGAffineTransformRotate(self.myImageView.transform, M_PI/4);
      } completion:NULL];
@@ -229,7 +287,8 @@ static CGFloat screenHeight;
 }
 
 - (IBAction) mySegmentedControlTapped: (id)sender {
-
+    
+    // selecting segment changes color for self.myView
     if (self.mySegmentedControl.selectedSegmentIndex == 0) {
         self.myView.backgroundColor = [UIColor blueColor];
     } else {
@@ -239,36 +298,39 @@ static CGFloat screenHeight;
 
 
 - (IBAction)addButtonTapped:(id)sender {
+    
+    // adds numbers labels num1 and num2 and displays sum in a label
     self.sum.text = [NSString stringWithFormat:@"%d", [self.num1.text intValue] +  [self.num2.text intValue]];
 }
 
--(void)dismissKeyboard
-{
+
+#pragma mark Misc methods
+
+-(void)dismissKeyboard {
+    
+    // clears keyboard when user taps outside of num1 and num2 label
     [self.num1 resignFirstResponder];
     [self.num2 resignFirstResponder];
+    [self.myTextView resignFirstResponder];
+
 }
 
 
-#pragma mark Check Device Orientation
+- (CGFloat) calculateScrollContentHeight {
 
-- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id <UIViewControllerTransitionCoordinator>)coordinator
-{
-    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    // calculates self.contentView subviews to set content size of scroll view
+    CGFloat topPoint = 0;
+    CGFloat height = 0;
     
-    // Code to execute before the rotation begins.
-    
-    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-        
-    // Code to perform animations during the rotation, or pass nil or leave this block empty if not necessary.
-        
-    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-        
-        // Code here will execute after the rotation has finished.
-
-        // check self.view size and set self.myCornerView to lower rhs after rotation
-        self.myCornerView.frame = CGRectMake(self.view.bounds.size.width - MAX_NUM, self.view.bounds.size.height - MAX_NUM, MAX_NUM, MAX_NUM);
-    }];
+    for (UIView *myView in self.myContentView.subviews) {
+        if (myView.frame.origin.y > topPoint) {
+            topPoint = myView.frame.origin.y;
+            height = myView.frame.size.height;
+        }
+    }
+    return height + topPoint;
 }
+    
 
 
 - (void)didReceiveMemoryWarning {

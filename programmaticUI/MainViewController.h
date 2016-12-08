@@ -9,6 +9,9 @@
 #import <UIKit/UIKit.h>
 
 @interface MainViewController : UIViewController
+
+@property (nonatomic, strong) UIScrollView *myScrollView;
+@property (nonatomic,strong) UIView *myContentView;
 @property (nonatomic,strong) UILabel *myLabel;
 @property (nonatomic,strong) UIImageView *myImageView;
 @property (nonatomic,strong) UIView *myView;
@@ -16,10 +19,13 @@
 @property (nonatomic,strong) UIButton *rotateButton;
 @property (nonatomic,strong) UISegmentedControl *mySegmentedControl;
 @property (nonatomic,strong) UITextView *myTextView;
+@property (nonatomic,strong) UIView *calcView;
 @property (nonatomic,strong) UITextField *num1;
 @property (nonatomic,strong) UITextField *num2;
 @property (nonatomic,strong) UILabel *sum;
 
+- (void) createAllObjects;
+- (void) createScrollView;
 - (void) createLabel;
 - (void) createImageView;
 - (void) createRotateButton;
@@ -33,5 +39,6 @@
 - (IBAction) mySegmentedControlTapped: (id)sender;
 - (IBAction)addButtonTapped:(id)sender;
 
+- (CGFloat) calculateScrollContentHeight;
 
 @end
